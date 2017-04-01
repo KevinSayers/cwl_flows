@@ -1,3 +1,3 @@
 # CWL
 
-Some common workflow languange flows
+Some common workflow language flows
