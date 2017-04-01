@@ -1,0 +1,21 @@
+fqSeqs:
+    - forward:
+        class: File
+        path: /Users/andersg/Documents/dev/mdu-qc-cwl/workflows/genometrackr/SRR2736093_1.fastq.gz
+      reverse:
+        class: File
+        path: /Users/andersg/Documents/dev/mdu-qc-cwl/workflows/genometrackr/SRR2736093_2.fastq.gz
+      seqid: SRR2736093
+      seed: [42,10]
+      number: [10,10]
+      rep: [1,2]
+    - forward:
+        class: File
+        path: /Users/andersg/Documents/dev/mdu-qc-cwl/workflows/genometrackr/SRR2736094_1.fastq.gz
+      reverse:
+        class: File
+        path: /Users/andersg/Documents/dev/mdu-qc-cwl/workflows/genometrackr/SRR2736094_2.fastq.gz
+      seqid: SRR2736094
+      seed: [69, 12]
+      number: [10,10]
+      rep: [1,2]
