@@ -68,7 +68,10 @@ steps:
                         var tmp = {}
                         tmp['forward'] = inputs.seq_1[i];
                         tmp['reverse'] = inputs.seq_2[i];
-                        tmp['seqid'] = inputs.seqid
+                        tmp['seqid'] = inputs.seqid;
+                        tmp['seed'] = [inputs.seed[i]];
+                        tmp['number'] = [inputs.number[i]];
+                        tmp['rep'] = [inputs.rep[i]];
                         ret.push(tmp);
                     }
                     return { 'fastq_pair_out' : ret }
@@ -77,5 +80,8 @@ steps:
             seq_1: subsample_1/seqtkout
             seq_2: subsample_2/seqtkout
             seqid: seqid
+            seed: seed
+            number: number
+            rep: rep
         out:
             [ fastq_pair_out ]
