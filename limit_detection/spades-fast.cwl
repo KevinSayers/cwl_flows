@@ -6,7 +6,7 @@ baseCommand: spades-fast
 requirements:
  - class: ResourceRequirement
    coresMin: 2
-   coresMax: 4
+   coresMax: 8
 
 inputs:
     forward_reads:

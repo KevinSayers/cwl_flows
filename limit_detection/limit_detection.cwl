@@ -84,6 +84,8 @@ steps:
             output_dir:
                 source: unpack_output/read_pairs
                 valueFrom: $(self.seqid)-$(self.number[0])-$(self.seed[0])-$(self.rep[0])_spades
+            threads:
+                valueFrom: ${return 8;}
         out:
             [assembly, run_id]
         scatter: [forward_reads, reverse_reads, output_dir]
