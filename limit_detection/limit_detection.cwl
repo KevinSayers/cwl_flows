@@ -73,40 +73,17 @@ steps:
         out:
             [read_pairs]
 
-#    spades:
-#        in:
-#            forward_reads:
-#                source: unpack_output/read_pairs
-#                valueFrom: $(self.forward)
-#            reverse_reads:
-#                source: unpack_output/read_pairs
-#                valueFrom: $(self.reverse)
-#            output_dir:
-#                source: unpack_output/read_pairs
-#                valueFrom: $(self.seqid)-$(self.number[0])-$(self.seed[0])-$(self.rep[0])_spades
-#            only_assembler:
-#                valueFrom: ${return true;}
-#            threads:
-#                valueFrom: ${return 2;}
-#            kmers:
-#                valueFrom: ${return "33";}
-#        out:
-#            [assembly, run_id]
-#        scatter: [forward_reads, reverse_reads, output_dir]
-#        scatterMethod: dotproduct
-#        run: spades.cwl
-
     spades-fast:
         in:
             forward_reads:
                 source: unpack_output/read_pairs
                 valueFrom: $(self.forward)
-        reverse_reads:
-            source: unpack_output/read_pairs
-            valueFrom: $(self.reverse)
-        output_dir:
-            source: unpack_output/read_pairs
-            valueFrom: $(self.seqid)-$(self.number[0])-$(self.seed[0])-$(self.rep[0])_spades
+            reverse_reads:
+                source: unpack_output/read_pairs
+                valueFrom: $(self.reverse)
+            output_dir:
+                source: unpack_output/read_pairs
+                valueFrom: $(self.seqid)-$(self.number[0])-$(self.seed[0])-$(self.rep[0])_spades
         out:
             [assembly, run_id]
         scatter: [forward_reads, reverse_reads, output_dir]
