@@ -99,8 +99,8 @@ steps:
     spades-fast:
         in:
             forward_reads:
-            source: unpack_output/read_pairs
-            valueFrom: $(self.forward)
+                source: unpack_output/read_pairs
+                valueFrom: $(self.forward)
         reverse_reads:
             source: unpack_output/read_pairs
             valueFrom: $(self.reverse)
