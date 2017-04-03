@@ -116,9 +116,9 @@ steps:
                         glob: "*.fasta"
         in:
             spades_contigs:
-                source: spades/assembly
+                source: spades-fast/assembly
             run_id:
-                source: spades/run_id
+                source: spades-fast/run_id
             exec_path: exec_path
         out:
             [contigs]
