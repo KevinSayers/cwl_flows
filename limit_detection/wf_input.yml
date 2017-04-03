@@ -19,3 +19,5 @@ fqSeqs:
       seed: [69, 12]
       number: [1000,1000]
       rep: [1,2]
+
+exec_path: "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/Library/TeX/texbin:/usr/local/bin/:/Users/andersg/bin/:/Users/andersg/Documents/dev/cwl_flows/limit_detection"

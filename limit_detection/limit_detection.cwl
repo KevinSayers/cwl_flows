@@ -13,6 +13,8 @@ inputs:
         type:
             type: array
             items: "readPair.yml#FilePair"
+    exec_path:
+        type: string
 
 outputs:
     mlst_collection:
@@ -95,9 +97,13 @@ steps:
         run: spades.cwl
 
     rename_contigs:
+        requirements:
+            - class: EnvVarRequirement
+              envDef:
+                PATH: $(inputs.exec_path)
         run:
             class: CommandLineTool
-            baseCommand: /Users/andersg/Documents/dev/cwl_flows/limit_detection/move_contigs.sh
+            baseCommand: move_contigs.sh
             inputs:
                 spades_contigs:
                     type: File
@@ -107,6 +113,8 @@ steps:
                     type: string
                     inputBinding:
                         position: 2
+                exec_path:
+                    type: string
             outputs:
                 contigs:
                     type: File
@@ -117,6 +125,7 @@ steps:
                 source: spades/assembly
             run_id:
                 source: spades/run_id
+            exec_path: exec_path
         out:
             [contigs]
         scatter: [spades_contigs, run_id]
@@ -134,22 +143,27 @@ steps:
 
     collect_mlst_res:
         requirements:
-            InitialWorkDirRequirement:
-                listing:
-                    - entryname: paths.txt
-                      entry: ${ var res = '';
-                                for (var i = 0; i < inputs.mlstout.length; ++i) {
-                                    res += inputs.mlstout[i].path + '\n';
-                                }
-                                return res;
+        - class: EnvVarRequirement
+          envDef:
+            PATH: $(inputs.exec_path)
+        - class: InitialWorkDirRequirement
+          listing:
+            - entryname: paths.txt
+              entry: ${ var res = '';
+                        for (var i = 0; i < inputs.mlstout.length; ++i) {
+                            res += inputs.mlstout[i].path + '\n';
                             }
+                            return res;
+                        }
         run:
             class: CommandLineTool
-            baseCommand: ['python3', '/Users/andersg/Documents/dev/cwl_flows/limit_detection/collect_mlst.py']
+            baseCommand: ['collect_mlst.py']
             arguments: ["paths.txt"]
             inputs:
                 mlstout:
                     type: File[]
+                exec_path:
+                    type: string
             outputs:
                 mlst_table:
                     type: File
@@ -157,5 +171,6 @@ steps:
                         glob: "mlst_res.tab"
         in:
             mlstout: mlst/mlstout
+            exec_path: exec_path
         out:
             [mlst_table]
