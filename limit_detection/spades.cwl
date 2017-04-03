@@ -44,3 +44,9 @@ outputs:
         type: File
         outputBinding:
             glob: $(inputs.output_dir)/contigs.fasta
+    run_id:
+        type: string
+        outputBinding:
+            outputEval: ${
+                return inputs.output_dir;
+                }

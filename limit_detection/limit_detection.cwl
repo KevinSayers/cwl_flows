@@ -15,15 +15,9 @@ inputs:
             items: "readPair.yml#FilePair"
 
 outputs:
-    fqout:
-        type: "readPair.yml#FilePair[]"
-        outputSource: subsample/resampled_fastq
-    assemblies:
-        type: File[]
-        outputSource: spades/assembly
-    mlst_res:
-        type: File[]
-        outputSource: mlst/mlstout
+    mlst_collection:
+        type: File
+        outputSource: collect_mlst_res/mlst_table
 
 steps:
     subsample:
@@ -95,16 +89,73 @@ steps:
             kmers:
                 valueFrom: ${return "33";}
         out:
-            [assembly]
+            [assembly, run_id]
         scatter: [forward_reads, reverse_reads, output_dir]
         scatterMethod: dotproduct
         run: spades.cwl
 
+    rename_contigs:
+        run:
+            class: CommandLineTool
+            baseCommand: /Users/andersg/Documents/dev/cwl_flows/limit_detection/move_contigs.sh
+            inputs:
+                spades_contigs:
+                    type: File
+                    inputBinding:
+                        position: 1
+                run_id:
+                    type: string
+                    inputBinding:
+                        position: 2
+            outputs:
+                contigs:
+                    type: File
+                    outputBinding:
+                        glob: "*.fasta"
+        in:
+            spades_contigs:
+                source: spades/assembly
+            run_id:
+                source: spades/run_id
+        out:
+            [contigs]
+        scatter: [spades_contigs, run_id]
+        scatterMethod: dotproduct
+
+
     mlst:
         in:
             contigs:
-                source: spades/assembly
+                source: rename_contigs/contigs
         out:
             [mlstout]
         scatter: contigs
         run: mlst.cwl
+
+    collect_mlst_res:
+        requirements:
+            InitialWorkDirRequirement:
+                listing:
+                    - entryname: paths.txt
+                      entry: ${ var res = '';
+                                for (var i = 0; i < inputs.mlstout.length; ++i) {
+                                    res += inputs.mlstout[i].path + '\n';
+                                }
+                                return res;
+                            }
+        run:
+            class: CommandLineTool
+            baseCommand: ['python3', '/Users/andersg/Documents/dev/cwl_flows/limit_detection/collect_mlst.py']
+            arguments: ["paths.txt"]
+            inputs:
+                mlstout:
+                    type: File[]
+            outputs:
+                mlst_table:
+                    type: File
+                    outputBinding:
+                        glob: "mlst_res.tab"
+        in:
+            mlstout: mlst/mlstout
+        out:
+            [mlst_table]
