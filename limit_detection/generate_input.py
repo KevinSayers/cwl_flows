@@ -75,7 +75,6 @@ def make_input(input_file, n_reps, minsize, maxsize, stepsize, steps, seed):
     input_table = pandas.read_csv(input_file, sep = None, header = None,
         names = ['SAMPLE', 'READ1', 'READ2'], engine="python")
     n_samples = input_table.shape[0]
-    print(input_table)
     logging.debug("Found {} samples.".format(n_samples))
 
     logging.info("Checking I can read FASTQ files...")
