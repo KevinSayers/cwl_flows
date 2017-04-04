@@ -30,7 +30,7 @@ def create_fqSeqs(row, number, reps, seeds):
 
     out['reverse'] = {}
     out['reverse']['class'] = 'File'
-    out['reverse']['path'] = row.READ1
+    out['reverse']['path'] = row.READ2
 
     out['seqid'] = row.SAMPLE
 
