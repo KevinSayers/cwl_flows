@@ -45,7 +45,7 @@ def create_fqSeqs(row, number, reps, seeds):
 def generate_seeds(n_samples, n_runs, seed):
     RS = numpy.random.mtrand.RandomState()
     RS.seed(seed)
-    seeds = RS.randint(low = 10, high = sys.maxsize, size = (n_samples, n_runs))
+    seeds = RS.randint(low = 10, high = 10**8, size = (n_samples, n_runs))
     return seeds
 
 @click.command()
