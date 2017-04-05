@@ -24,7 +24,7 @@ def run_cwltool(args):
     p = subprocess.Popen(shlex.split(cmd), stdout = subprocess.PIPE, stderr = subprocess.PIPE)
     out, err = p.communicate()
     logging.info("Output from {} was: {}".format(inyml, out))
-    logging.info("Error from {} was: {}}".format(inyml, err))
+    logging.info("Error from {} was: {}".format(inyml, err))
     return json.loads(out)
 
 def build_jobs(tool, inyml, cachedir, tmpdir):
@@ -48,6 +48,10 @@ def parallel_cwltool(cwl_tool, cwl_inputs, n_jobs, cachedir_prefix, tmpdir_prefi
     jobs = build_jobs(cwl_tool, cwl_inputs, cachedir_prefix, tmpdir_prefix)
     p = multiprocessing.Pool(n_jobs)
     results = p.map(run_cwltool, jobs)
+    fn = open("process_dump.json", 'w')
+    for r in results:
+        fn.write(json.dump(r, indent = 4))
+    fn.close()
     pass
 
 if __name__ == "__main__":
