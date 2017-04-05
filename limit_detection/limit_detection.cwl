@@ -15,6 +15,8 @@ inputs:
             items: "readPair.yml#FilePair"
     exec_path:
         type: string
+    out_fn:
+        type: string
 
 outputs:
     mlst_collection:
@@ -160,13 +162,18 @@ steps:
                     type: File[]
                 exec_path:
                     type: string
+                out_fn:
+                    type: string
+                    inputBinding:
+                        position: 2
             outputs:
                 mlst_table:
                     type: File
                     outputBinding:
-                        glob: "mlst_res.tab"
+                        glob: "*.tab"
         in:
             mlstout: mlst/mlstout
             exec_path: exec_path
+            out_fn: out_fn
         out:
             [mlst_table]

@@ -34,8 +34,9 @@ def parse_result(filename):
 
 if __name__ == '__main__':
     list_of_files = sys.argv[1]
+    output_file = sys.argv[2]
     fl = open(list_of_files)
-    fn = open("mlst_res.tab", 'w')
+    fn = open(output_file, 'w')
     for mlstout in fl:
         mlstout = mlstout.strip()
         mlstout = parse_result(mlstout)

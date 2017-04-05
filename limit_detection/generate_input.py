@@ -69,7 +69,9 @@ def generate_seeds(n_samples, n_runs, seed):
 @click.option("--seed",
     help="Overall seed used to calculate all seeds",
     default = 42, show_default = True)
-def make_input(input_file, n_reps, minsize, maxsize, stepsize, steps, seed):
+@click.option("--split", is_flag = True,
+    help="Split over multiple inputs?")
+def make_input(input_file, n_reps, minsize, maxsize, stepsize, steps, seed, split):
 
     # read input file
     input_table = pandas.read_csv(input_file, sep = None, header = None,
@@ -131,11 +133,26 @@ def make_input(input_file, n_reps, minsize, maxsize, stepsize, steps, seed):
     outyaml = {}
     logging.info("Creating exec path...")
     outyaml['exec_path'] = os.environ["PATH"] + ':' + os.getcwd()
-    logging.info("Creating fqSeqs...")
-    outyaml['fqSeqs'] = [create_fqSeqs(row, numbers, reps, list(seeds[i])) for i, row in enumerate(input_table.itertuples())]
-    logging.info("Outputting the YAML input:")
-    print(yaml.dump(outyaml))
 
+    if not split:
+        logging.info("Creating YAML object")
+        outyaml = {}
+        logging.info("Creating exec path...")
+        outyaml['exec_path'] = os.environ["PATH"] + ':' + os.getcwd()
+        logging.info("Creating fqSeqs...")
+        outyaml['fqSeqs'] = [create_fqSeqs(row, numbers, reps, list(seeds[i])) for i, row in enumerate(input_table.itertuples())]
+        outyaml['out_fn'] = 'mlst_res.tab'
+        logging.info("Outputting the YAML input:")
+        print(yaml.dump(outyaml))
+    else:
+        logging.info("Creating multiple YAML objects")
+        for i, row in enumerate(input_table.itertuples()):
+            filename = row.SAMPLE + '_' + str(i)
+            fn = open(filename + '.yml', 'w')
+            outyaml['fqSeqs'] = [create_fqSeqs(row, numbers, reps, list(seeds[i]))]
+            outyaml['out_fn'] = row.SAMPLE + '_' + str(i) + '.tab'
+            fn.write(yaml.dump(outyaml))
+            fn.close()
 
 
 if __name__ == "__main__":
