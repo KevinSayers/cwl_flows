@@ -50,7 +50,7 @@ def parallel_cwltool(cwl_tool, cwl_inputs, n_jobs, cachedir_prefix, tmpdir_prefi
     results = p.map(run_cwltool, jobs)
     fn = open("process_dump.json", 'w')
     for r in results:
-        fn.write(json.dump(r, indent = 4))
+        fn.write(json.dumps(r, indent = 4))
     fn.close()
     pass
 
