@@ -85,7 +85,7 @@ steps:
                 valueFrom: $(self.reverse)
             output_dir:
                 source: unpack_output/read_pairs
-                valueFrom: $(self.seqid)-$(self.number[0])-$(self.seed[0])-$(self.rep[0])_spades
+                valueFrom: $(self.seqid)___$(self.number[0])-$(self.seed[0])-$(self.rep[0])___spades
             threads:
                 valueFrom: ${return 8;}
         out:

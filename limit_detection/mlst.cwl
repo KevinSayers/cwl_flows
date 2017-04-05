@@ -3,10 +3,10 @@ class: CommandLineTool
 baseCommand: mlst
 stdout: ${
         var splitAll = function (str) {
-            return str.split('\\').pop().split('/').reverse()[0].split('_')[0];
+            return str.split('\\').pop().split('/').reverse()[0].replace(/___\w+$/g, '___mlst');
             };
         var dir = splitAll(inputs.contigs.location);
-        return dir + '_mlst.tab';
+        return dir;
         }
 inputs:
   contigs:

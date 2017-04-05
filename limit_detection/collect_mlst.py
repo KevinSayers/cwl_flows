@@ -10,12 +10,12 @@ from fnmatch import fnmatch
 
 def parse_run(run_path):
     run_id = os.path.basename(run_path)
-    run_id = run_id.split('_')[0]
-    run_id = run_id.split('-')
+    run_id = run_id.split('___')
     rid = run_id[0]
-    n_reads = run_id[1]
-    seed = run_id[2]
-    rep = run_id[3]
+    run_info = run_id[1].split('-')
+    n_reads = run_info[1]
+    seed = run_info[2]
+    rep = run_info[3]
     return (rid, n_reads, seed, rep)
 
 def parse_result(filename):

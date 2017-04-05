@@ -2,7 +2,7 @@ cwlVersion: v1.0
 class: CommandLineTool
 
 baseCommand: ['seqtk', 'sample']
-stdout: $(inputs.seqid)-$(inputs.number)-$(inputs.seed)-$(inputs.rep)_R$(inputs.read_number).fq
+stdout: $(inputs.seqid)___$(inputs.number)-$(inputs.seed)-$(inputs.rep)___R$(inputs.read_number).fq
 inputs:
     seed:
         type: int
