@@ -8,6 +8,7 @@ import logging
 import subprocess
 import shlex
 import os
+import json
 
 #def run_cwltool(tool, inyml, cachedir = None, tmpdir = None):
 def run_cwltool(args):
@@ -20,13 +21,11 @@ def run_cwltool(args):
         cmd += ' --tmpdir-prefix {}'.format(os.path.join(tmpdir, yml_prefix))
     cmd += ' {} {}'.format(tool, inyml)
     logging.info("Running {}".format(cmd))
-    try:
-        p = subprocess.Popen(shlex.split(cmd), stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-        out, err = p.communicate()
-        logging.info("Output from {} was: {}".format(inyml, out))
-        logging.info("Error from {} was: {}}".format(inyml, err))
-    except:
-        logging.critical("Could not finish {}".format(inyml))
+    p = subprocess.Popen(shlex.split(cmd), stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+    out, err = p.communicate()
+    logging.info("Output from {} was: {}".format(inyml, out))
+    logging.info("Error from {} was: {}}".format(inyml, err))
+    return json.loads(out)
 
 def build_jobs(tool, inyml, cachedir, tmpdir):
     jobs = []
