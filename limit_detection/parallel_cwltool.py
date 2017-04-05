@@ -23,6 +23,8 @@ def run_cwltool(args):
     try:
         p = subprocess.Popen(shlex.split(cmd), stdout = subprocess.PIPE, stderr = subprocess.PIPE)
         out, err = p.communicate()
+        logging.info("Output from {} was: {}".format(inyml, out))
+        logging.info("Error from {} was: {}}".format(inyml, err))
     except:
         logging.critical("Could not finish {}".format(inyml))
 
