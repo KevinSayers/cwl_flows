@@ -13,9 +13,9 @@ def parse_run(run_path):
     run_id = run_id.split('___')
     rid = run_id[0]
     run_info = run_id[1].split('-')
-    n_reads = run_info[1]
-    seed = run_info[2]
-    rep = run_info[3]
+    n_reads = run_info[0]
+    seed = run_info[1]
+    rep = run_info[2]
     return (rid, n_reads, seed, rep)
 
 def parse_result(filename):
