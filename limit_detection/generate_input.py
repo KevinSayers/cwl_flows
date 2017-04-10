@@ -34,7 +34,7 @@ def create_fqSeqs(row, number, reps, seeds):
 
     out['seqid'] = row.SAMPLE
 
-    out['number'] = number
+    out['number'] = [int(numb) for numb in number]
 
     out["rep"] = reps
 
@@ -66,16 +66,20 @@ def generate_seeds(n_samples, n_runs, seed):
     help="Comma separated list of number of reads to keep --- \
     will override minsize, maxsize, and stepstze",
     default = None, show_default = True)
+@click.option("--depth", "-d",
+    help="Comma separated list of depth of coverage to keep --- \
+    will override --steps and --stepsize",
+    default = None, show_default = True)
 @click.option("--seed",
     help="Overall seed used to calculate all seeds",
     default = 42, show_default = True)
 @click.option("--split", is_flag = True,
     help="Split over multiple inputs?")
-def make_input(input_file, n_reps, minsize, maxsize, stepsize, steps, seed, split):
+def make_input(input_file, n_reps, minsize, maxsize, stepsize, steps, depth, seed, split):
 
     # read input file
     input_table = pandas.read_csv(input_file, sep = None, header = None,
-        names = ['SAMPLE', 'READ1', 'READ2'], engine="python")
+        names = ['SAMPLE', 'READ1', 'READ2', 'GENOME_SIZE', 'READ_LENGTH'], engine="python")
     n_samples = input_table.shape[0]
     logging.debug("Found {} samples.".format(n_samples))
 
@@ -87,16 +91,21 @@ def make_input(input_file, n_reps, minsize, maxsize, stepsize, steps, seed, spli
     logging.info("All FASTQs were found!")
 
     # sorting out numbers expect the output to be List[Int, Int, ..., Int]
-    if steps == None:
-        logging.info("Steps were not specified, using min, max, and step size.")
-        numbers = list(range(minsize, maxsize+1, stepsize))
-
-    else:
-        logging.info("Actual steps were specified.")
+    if steps != None:
+        logging.info("Actual steps were specified...")
         numbers = steps.split(',')
         numbers = [int(nb) for nb in numbers]
 
-    total_steps = len(numbers)
+    elif depth != None:
+        logging.info("Depth was specified...")
+        depth = [int(d) for d in depth.split(",")]
+        numbers = []
+        for row in input_table.itertuples():
+            numbers.append([(row.GENOME_SIZE * d)//(row.READ_LENGTH * 2) for d in depth])
+    else:
+        logging.info("Using min, max, and step size.")
+        numbers = list(range(minsize, maxsize+1, stepsize))
+    total_steps = len(numbers) if type(numbers[0]) == int else len(numbers[0])
     logging.info("Total number of steps per sample per replicate is {}".format(total_steps))
 
     # creating a list of rep number for indexing
@@ -115,8 +124,17 @@ def make_input(input_file, n_reps, minsize, maxsize, stepsize, steps, seed, spli
 
     # unfolding the numbers to that there are exactly n_reps for number of reads
     # kept
-    numbers = [[nb]*n_reps for nb in numbers]
-    numbers = [nb for sublist in numbers for nb in sublist]
+    if type(numbers[0]) == int:
+        numbers = [[nb]*n_reps for nb in numbers]
+        numbers = [nb for sublist in numbers for nb in sublist]
+    else:
+        numbers_original = numbers
+        tmp = []
+        for numbers in numbers_original:
+            numbers = [[nb]*n_reps for nb in numbers]
+            numbers = [nb for sublist in numbers for nb in sublist]
+            tmp.append(numbers)
+        numbers = tmp
 
     # generating some seeds
     logging.info("Generating seeds... ")
@@ -125,7 +143,10 @@ def make_input(input_file, n_reps, minsize, maxsize, stepsize, steps, seed, spli
 
     # length of reps and numbers should now be equal to total_runs
     logging.info("Checking sanity of data...")
-    assert len(numbers) == total_runs
+    if type(numbers[0]) == int:
+        assert len(numbers) == total_runs
+    else:
+         assert len(numbers[0]) == total_runs
     assert len(reps) == total_runs
     logging.info("Sanity check ok...")
 
@@ -140,7 +161,11 @@ def make_input(input_file, n_reps, minsize, maxsize, stepsize, steps, seed, spli
         logging.info("Creating exec path...")
         outyaml['exec_path'] = os.environ["PATH"] + ':' + os.getcwd()
         logging.info("Creating fqSeqs...")
-        outyaml['fqSeqs'] = [create_fqSeqs(row, numbers, reps, list(seeds[i])) for i, row in enumerate(input_table.itertuples())]
+        if type(numbers[0]) == int:
+            outyaml['fqSeqs'] = [create_fqSeqs(row, numbers, reps, list(seeds[i])) for i, row in enumerate(input_table.itertuples())]
+        else:
+            print(numbers[i])
+            outyaml['fqSeqs'] = [create_fqSeqs(row, numbers[i], reps, list(seeds[i])) for i, row in enumerate(input_table.itertuples())]
         outyaml['out_fn'] = 'mlst_res.tab'
         logging.info("Outputting the YAML input:")
         print(yaml.dump(outyaml))
@@ -149,11 +174,13 @@ def make_input(input_file, n_reps, minsize, maxsize, stepsize, steps, seed, spli
         for i, row in enumerate(input_table.itertuples()):
             filename = row.SAMPLE + '_' + str(i)
             fn = open(filename + '.yml', 'w')
-            outyaml['fqSeqs'] = [create_fqSeqs(row, numbers, reps, list(seeds[i]))]
+            if type(numbers[0]) == int:
+                outyaml['fqSeqs'] = [create_fqSeqs(row, numbers, reps, list(seeds[i]))]
+            else:
+                outyaml['fqSeqs'] = [create_fqSeqs(row, numbers[i], reps, list(seeds[i]))]
             outyaml['out_fn'] = row.SAMPLE + '_' + str(i) + '.tab'
             fn.write(yaml.dump(outyaml))
             fn.close()
-
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
